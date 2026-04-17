@@ -1,15 +1,15 @@
 import sqlite3
 import json
-import chromadb # <--- Nueva pieza del motor
+import chromadb 
 
 class DatabaseManager:
     def __init__(self, db_path="archivos_ia.db"):
-        # 1. SQLite para metadatos (el de siempre)
+        # 1. SQLite para metadatos 
         self.conn = sqlite3.connect(db_path)
         self.cursor = self.conn.cursor()
         self._create_table()
         
-        # 2. ChromaDB para búsqueda vectorial (el turbo)
+        # 2. ChromaDB para búsqueda vectorial
         self.chroma_client = chromadb.PersistentClient(path="./chroma_db")
         self.collection = self.chroma_client.get_or_create_collection(name="archivos_embeddings")
 
@@ -57,7 +57,7 @@ class DatabaseManager:
         results = self.collection.query(
             query_embeddings=[embedding_consulta],
             n_results=5,
-            where_document=None # Aquí podrías filtrar por extensión si quisieras
+            where_document=None 
         )
         return results
 
