@@ -4,10 +4,10 @@ def get_embedding(text: str) -> list[float]:
     """
     Convierte un texto en un vector numérico usando Ollama.
     """
-    # 1. Limpieza básica: Eliminar espacios extra que ensucian el embedding
+    #Limpieza básica: Eliminar espacios extra que ensucian el embedding
     clean_text = text.strip()
     
-    # 2. Control de longitud: nomic-embed-text tiene un límite (context window)
+    # 2. Control de longitud: nomic-embed-text 
     # Si el texto es demasiado largo, lo truncamos para evitar errores de la API
     max_chars = 8000 
     if len(clean_text) > max_chars:
