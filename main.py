@@ -6,6 +6,9 @@ from pathlib import Path
 import pandas as pd
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# IMPORTACIÓN DEL NUEVO MÓDULO
+from core.limpieza import mover_a_cuarentena
+
 # LIBRERÍAS VISUALES
 from rich.console import Console
 from rich.table import Table
@@ -16,12 +19,10 @@ from rich import print as rprint
 console = Console()
 
 def procesar_archivo_ia(f, db_manager):
-    """Función trabajadora para cada hilo"""
     try:
         file_hash = f.get('hash') or hash_file(f['path'])
         embedding = db_manager.get_embedding(file_hash)
         
-        # Si no existe en caché, generamos
         if embedding is None or (isinstance(embedding, list) and len(embedding) == 0):
             with open(f['path'], 'r', errors='ignore') as file:
                 contenido = file.read(2500)
@@ -31,7 +32,6 @@ def procesar_archivo_ia(f, db_manager):
                 if embedding:
                     db_manager.save_embedding(file_hash, f['path'], embedding, f['name'])
         
-        # Sincronizamos con ChromaDB
         if embedding and isinstance(embedding, list):
             db_manager.collection.upsert(
                 ids=[file_hash],
@@ -45,10 +45,10 @@ def procesar_archivo_ia(f, db_manager):
 
 # 1. Inicialización
 db = DatabaseManager()
-PATH_A_REVISAR = '/Users/sergiogutierrez/Downloads'
+PATH_A_REVISAR = '/Users/sergiogutierrez/Downloads' # Ajusta tu ruta aquí
 
 console.print(Panel.fit(
-    f"[bold cyan]🚀 SISTEMA DE AUDITORÍA SEMÁNTICA (MODO PARALELO)[/bold cyan]\n[gray]Ruta objetivo: {PATH_A_REVISAR}[/gray]",
+    f"[bold cyan]🚀 SISTEMA DE AUDITORÍA SEMÁNTICA[/bold cyan]\n[gray]Preparado para limpieza automática[/gray]",
     border_style="blue"
 ))
 
@@ -58,12 +58,10 @@ with console.status("[bold yellow]Escaneando archivos...", spinner="dots"):
     duplicados_exactos = find_exact_duplicates(archivos)
 
 rprint(f"[green]✔[/green] Archivos detectados: [bold]{len(archivos)}[/bold]")
-rprint(f"[green]✔[/green] Duplicados exactos: [bold]{len(duplicados_exactos)}[/bold]")
 
 # 3. Preparación
 interesantes = ['.java', '.py', '.txt', '.md']
 candidatos_ia = [f for f in archivos if Path(f['path']).suffix in interesantes]
-rprint(f"[green]✔[/green] Candidatos para análisis IA: [bold]{len(candidatos_ia)}[/bold]")
 
 # 4. Fase de Indexación y Análisis CONCURRENTE
 resultados_similitud = []
@@ -76,18 +74,13 @@ with Progress(
     console=console
 ) as progress:
     
-    # TAREA 1: Indexación en paralelo
-    task_idx = progress.add_task("[cyan]Indexando vectores en paralelo...", total=len(candidatos_ia))
-    
-    # Usamos 4 workers (ideal para no saturar Ollama pero agilizar disco)
+    task_idx = progress.add_task("[cyan]Indexando vectores...", total=len(candidatos_ia))
     with ThreadPoolExecutor(max_workers=4) as executor:
         futures = [executor.submit(procesar_archivo_ia, f, db) for f in candidatos_ia]
         for _ in as_completed(futures):
             progress.update(task_idx, advance=1)
 
-    # TAREA 2: Búsqueda Semántica (Esta sigue siendo rápida en secuencial, pero visualmente limpia)
     task_sim = progress.add_task("[magenta]Analizando similitudes...", total=len(candidatos_ia))
-    
     for f in candidatos_ia:
         f_hash = f.get('hash') or hash_file(f['path'])
         emb = db.get_embedding(f_hash)
@@ -100,22 +93,26 @@ with Progress(
                 if f_hash < id_vecino: 
                     distancia = busqueda['distances'][0][1]
                     similitud = round((1 - distancia) * 100, 2)
+                    
                     if similitud > 85:
-                        meta = busqueda['metadatas'][0][1]
+                        meta_vecino = busqueda['metadatas'][0][1]
                         resultados_similitud.append({
                             'archivo_a': f['name'],
-                            'archivo_b': meta.get('name', 'Desconocido'),
+                            'ruta_a': f['path'], # <--- GUARDAMOS RUTA PARA LIMPIAR
+                            'archivo_b': meta_vecino.get('name', 'Desconocido'),
+                            'ruta_b': meta_vecino.get('path'),
                             'similitud': similitud
                         })
         progress.update(task_sim, advance=1)
 
-# 6. Reporte Final
+# 6. Reporte Final y Acción de Limpieza
 console.print("\n[bold green]✅ ANÁLISIS COMPLETADO[/bold green]")
+
 if resultados_similitud:
     df = pd.DataFrame(resultados_similitud)
     sospechosos = df[df['similitud'] > 90].sort_values(by='similitud', ascending=False)
     
-    table = Table(title="[bold magenta]Top Archivos Similares Encontrados[/bold magenta]", header_style="bold cyan")
+    table = Table(title="[bold magenta]Top Archivos Similares[/bold magenta]", header_style="bold cyan")
     table.add_column("Archivo Principal", style="white")
     table.add_column("Posible Duplicado", style="yellow")
     table.add_column("% Similitud", justify="right", style="bold green")
@@ -124,8 +121,21 @@ if resultados_similitud:
         table.add_row(row['archivo_a'], row['archivo_b'], f"{row['similitud']}%")
     
     console.print(table)
-    df.to_csv('reporte_ia_avanzado.csv', index=False)
+
+    # --- LÓGICA DE LIMPIEZA FINAL ---
+    a_limpiar = [r['ruta_a'] for r in resultados_similitud if r['similitud'] > 95]
+
+    if a_limpiar:
+        console.print(f"\n[bold red]⚠️ Se han detectado {len(a_limpiar)} archivos con >95% de similitud.[/bold red]")
+        opcion = console.input("[bold white]¿Mover estos archivos a CUARENTENA? (s/n): [/bold white]")
+        
+        if opcion.lower() == 's':
+            with console.status("[bold red]Vaciando escritorio...", spinner="dots"):
+                total = mover_a_cuarentena(a_limpiar)
+            console.print(f"[bold green]✔ {total} archivos movidos correctamente. Revisa la carpeta 'CUARENTENA_IA'.[/bold green]")
+        else:
+            console.print("[blue]Operación cancelada. No se han movido archivos.[/blue]")
 else:
-    console.print("[yellow]🤖 No se encontraron similitudes significativas.[/yellow]")
+    console.print("[yellow]🤖 No se encontraron duplicados semánticos significativos.[/yellow]")
 
 db.close()

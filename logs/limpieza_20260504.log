@@ -1,0 +1,19 @@
+2026-05-04 18:02:00,257 - INFO - HTTP Request: POST http://127.0.0.1:11434/api/embeddings "HTTP/1.1 200 OK"
+2026-05-04 18:05:49,538 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/Sublime Text (4180).app/Contents/MacOS/attribution.txt -> CUARENTENA_IA/attribution.txt
+2026-05-04 18:05:49,538 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/Sublime Text (4180).app/Contents/MacOS/Lib/python38/sublime.py -> CUARENTENA_IA/sublime.py
+2026-05-04 18:05:49,539 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/Sublime Text (4180).app/Contents/MacOS/Lib/python38/sublime_plugin.py -> CUARENTENA_IA/sublime_plugin.py
+2026-05-04 18:05:49,540 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j 2/head_jni_BETA/LICENSE.txt -> CUARENTENA_IA/LICENSE.txt
+2026-05-04 18:05:49,540 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j 2/head/LICENSE.txt -> CUARENTENA_IA/180549_LICENSE.txt
+2026-05-04 18:05:49,540 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j 2/lib/flatlaf.LICENSE.txt -> CUARENTENA_IA/flatlaf.LICENSE.txt
+2026-05-04 18:05:49,541 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j 2/lib/ant.LICENSE.txt -> CUARENTENA_IA/ant.LICENSE.txt
+2026-05-04 18:05:49,541 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/mysql-connector-j-9.5.0 2/src/main/core-impl/java/com/mysql/cj/conf/url/FailoverConnectionUrl.java -> CUARENTENA_IA/FailoverConnectionUrl.java
+2026-05-04 18:05:49,541 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/mysql-connector-j-9.5.0 2/src/main/protocol-impl/java/com/mysql/cj/protocol/x/OkFactory.java -> CUARENTENA_IA/OkFactory.java
+2026-05-04 18:05:49,542 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/mysql-connector-j-9.5.0/src/main/core-impl/java/com/mysql/cj/conf/url/FailoverConnectionUrl.java -> CUARENTENA_IA/180549_FailoverConnectionUrl.java
+2026-05-04 18:05:49,542 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/mysql-connector-j-9.5.0/src/main/protocol-impl/java/com/mysql/cj/protocol/x/OkFactory.java -> CUARENTENA_IA/180549_OkFactory.java
+2026-05-04 18:05:49,543 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/carpeta sin título 3/mysql-connector-j-9.5.0/src/main/core-impl/java/com/mysql/cj/conf/url/FailoverConnectionUrl.java -> CUARENTENA_IA/180549_FailoverConnectionUrl.java
+2026-05-04 18:05:49,544 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/carpeta sin título 3/mysql-connector-j-9.5.0/src/main/protocol-impl/java/com/mysql/cj/protocol/x/OkFactory.java -> CUARENTENA_IA/180549_OkFactory.java
+2026-05-04 18:05:49,544 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/Sublime Text (4192).app/Contents/MacOS/Lib/python33/sublime.py -> CUARENTENA_IA/180549_sublime.py
+2026-05-04 18:05:49,545 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j/head_jni_BETA/LICENSE.txt -> CUARENTENA_IA/180549_LICENSE.txt
+2026-05-04 18:05:49,545 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j/head/LICENSE.txt -> CUARENTENA_IA/180549_LICENSE.txt
+2026-05-04 18:05:49,546 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j/lib/flatlaf.LICENSE.txt -> CUARENTENA_IA/180549_flatlaf.LICENSE.txt
+2026-05-04 18:05:49,546 - INFO - MOVIDO: /Users/sergiogutierrez/Downloads/launch4j/lib/ant.LICENSE.txt -> CUARENTENA_IA/180549_ant.LICENSE.txt
