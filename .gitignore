@@ -1,0 +1,19 @@
+# Bases de datos locales y caché de vectores
+chroma_db/
+archivos_ia.db
+
+# Reportes locales generados
+*.csv
+
+# Archivos temporales de sistema (macOS / Windows)
+.DS_Store
+Thumbs.db
+
+# Logs locales
+logs/
+
+# Entornos virtuales (por si usas venv)
+.venv/
+venv/
+__pycache__/
+*.pyc
