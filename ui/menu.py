@@ -20,8 +20,48 @@ class MenuPrincipal:
             border_style="blue"
         ))
 
+    def lanzar_organizacion(self):
+        """Módulo de clasificación rápida por extensiones (Paso 0 de limpieza)"""
+        ruta = Prompt.ask("\n📁 Ruta a organizar por extensiones", default="/Users/sergiogutierrez/Downloads")
+        
+        if not os.path.exists(ruta):
+            self.console.print("[red]❌ La ruta no existe.[/red]")
+            return
+
+        # Reutilizamos tu mismo componente de progreso visual
+        with Progress(
+            SpinnerColumn(),
+            TextColumn("[progress.description]{task.description}"),
+            BarColumn(),
+            TaskProgressColumn(),
+            console=self.console
+        ) as progress:
+            
+            task_org = progress.add_task("[yellow]Clasificando archivos por extensión...", total=None)
+            
+            # Llamamos al método puente que creamos en el Paso 2 en el AuditorEngine
+            resumen = self.engine.ejecutar_clasificacion_rapida(ruta)
+            
+            progress.update(task_org, completed=100, description="[green]Clasificación completada")
+
+        # Construimos una tabla estilizada con Rich para mostrar el resultado del movimiento
+        tabla = Table(title=f"\n[bold green]Reporte de Organización en:[/] {os.path.basename(ruta)}")
+        tabla.add_column("Carpeta Destino", style="cyan", justify="left")
+        tabla.add_column("Archivos Movidos", style="magenta", justify="right")
+        
+        archivos_movidos = False
+        for carpeta, total in resumen.items():
+            if total > 0:
+                tabla.add_row(carpeta, str(total))
+                archivos_movidos = True
+        
+        if archivos_movidos:
+            self.console.print(tabla)
+        else:
+            self.console.print("\n[yellow]⚠️ No se encontraron archivos nuevos sueltos para clasificar en esta ruta.[/yellow]")
+
     def lanzar_auditoria(self):
-        ruta = Prompt.ask("\n📂 Ruta a analizar", default="/Users/sergiogutierrez/Downloads")
+        ruta = Prompt.ask("\n📂 Ruta a analizar semánticamente", default="/Users/sergiogutierrez/Downloads")
         
         if not os.path.exists(ruta):
             self.console.print("[red]❌ La ruta no existe.[/red]")
@@ -70,23 +110,27 @@ class MenuPrincipal:
             table.add_row(r['archivo_a'], r['archivo_b'], f"{r['similitud']}%")
         
         self.console.print(table)
-        # Aquí llamarías a tu lógica de limpieza si quieres
 
     def run(self):
-        """Este es el método que fallaba. Es el bucle principal."""
+        """Bucle principal de la interfaz con la suite de herramientas completa"""
         while True:
             self.mostrar_header()
-            self.console.print("1. 🔍 Escanear Carpeta")
-            self.console.print("2. 📜 Ver Logs")
-            self.console.print("3. 🚪 Salir")
+            self.console.print("1. 📁 Clasificación Rápida (Mover a carpetas por Extensión)")
+            self.console.print("2. 🔍 Auditoría Semántica e Indexación (Ollama IA)")
+            self.console.print("3. 📜 Ver Logs")
+            self.console.print("4. 🚪 Salir")
             
-            opcion = Prompt.ask("\nSelecciona", choices=["1", "2", "3"])
+            opcion = Prompt.ask("\nSelecciona", choices=["1", "2", "3", "4"])
 
             if opcion == "1":
-                self.lanzar_auditoria()
+                self.lanzar_organizacion()
                 input("\nPresiona Enter para volver...")
             elif opcion == "2":
-                self.console.print("[yellow]Funcionalidad de logs en desarrollo...[/yellow]")
+                self.lanzar_auditoria()
                 input("\nPresiona Enter para volver...")
             elif opcion == "3":
+                self.console.print("[yellow]Funcionalidad de logs en desarrollo...[/yellow]")
+                input("\nPresiona Enter para volver...")
+            elif opcion == "4":
+                self.console.print("[bold red]Saliendo del sistema... ¡Buen día![/]")
                 break

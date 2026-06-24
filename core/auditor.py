@@ -3,6 +3,7 @@ from pathlib import Path
 from core.scanner import scan_folder
 from core.hasher import hash_file
 from core.embedder import get_embedding
+from core.organizador import OrganizadorExtensiones  # <-- IMPORTANTE: Añadimos esta línea
 
 class AuditorEngine:
     def __init__(self, db_manager):
@@ -13,6 +14,18 @@ class AuditorEngine:
         self.db = db_manager
         # Extensiones que la IA puede procesar semánticamente
         self.interesantes = ['.java', '.py', '.txt', '.md', '.pdf', '.js', '.html', '.css']
+        self.organizador = OrganizadorExtensiones()  # <-- NUEVO: Instanciamos el organizador
+
+    def ejecutar_clasificacion_rapida(self, ruta_base: str) -> dict:
+        """
+        Módulo de ordenación previo. Escanea la carpeta y la organiza por extensiones.
+        """
+        # Reutilizamos tu función para leer el directorio de forma limpia
+        archivos = scan_folder(ruta_base)
+        
+        # Le pasamos la lista al organizador y devolvemos el diccionario con el recuento
+        resumen = self.organizador.organizar_directorio(archivos, ruta_base)
+        return resumen
 
     def preparar_candidatos(self, ruta):
         """
